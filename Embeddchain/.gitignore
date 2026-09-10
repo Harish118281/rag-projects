@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# Generated databases
+vector_store/
+db/
+
+# Generated notes
+notes/
+

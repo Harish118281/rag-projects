@@ -1,0 +1,9 @@
+llm:
+  provider: google
+  config:
+    model: gemini-3.6-flash
+
+embedder:
+  provider: google
+  config:
+    model: models/gemini-embedding-001
