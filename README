@@ -1,0 +1,102 @@
+# RAG Projects
+
+This folder contains two PDF question-answering projects that demonstrate
+different retrieval-augmented generation (RAG) approaches.
+
+## Projects
+
+### 1. `RAG`
+
+`RAG` is a custom RAG pipeline built from small, separate Python modules:
+
+1. Loads text from `documents/book.pdf` with `pypdf`.
+2. Splits the text into overlapping chunks.
+3. Creates embeddings with
+   `sentence-transformers/all-MiniLM-L6-v2`.
+4. Stores embeddings in a FAISS index and stores the chunks in a pickle file.
+5. Retrieves context using a distance threshold.
+6. Generates an answer with Google's Gemini API.
+
+The vector database is automatically rebuilt when the source PDF changes. The
+generated files are stored in `RAG/vector_store/`.
+
+### 2. `Embeddchain`
+
+`Embeddchain` uses EmbedChain to provide a shorter, configuration-driven RAG
+application. It indexes `documents/Control_system.pdf` using the providers and
+models configured in `config.yaml`, then starts an interactive question loop.
+
+## Requirements
+
+- Python 3.11 or newer
+- A Google Gemini API key
+- Internet access for model downloads and API requests
+
+Install the dependencies used by the projects:
+
+```powershell
+pip install pypdf sentence-transformers faiss-cpu google-genai python-dotenv embedchain
+```
+
+## Configuration
+
+For `Embeddchain`, create a `.env` file in `Embeddchain/`:
+
+```text
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+Do not commit API keys or other secrets. `Embeddchain` loads this file with
+`python-dotenv`. The custom `RAG` application reads `GEMINI_API_KEY` directly
+from the process environment, so set it in PowerShell before running:
+
+```powershell
+$env:GEMINI_API_KEY = "your_gemini_api_key"
+```
+
+## Run the custom RAG application
+
+Run the application from its own directory so its relative paths resolve
+correctly:
+
+```powershell
+cd RAG
+python -m app.main
+```
+
+Ask questions at the prompt. Type `exit` to stop the chatbot. Replace
+`RAG/documents/book.pdf` with another PDF if you want to index a different
+source; the vector store will be regenerated when the file content changes.
+
+## Run the EmbedChain application
+
+```powershell
+cd Embeddchain
+python app.py
+```
+
+Ask questions about `documents/Control_system.pdf` and type `exit` to quit.
+To change the model or provider, edit `Embeddchain/config.yaml`.
+
+## Project layout
+
+```text
+RAG-PROJECTS/
+├── RAG/
+│   ├── app/
+│   │   ├── chunk.py       # Text chunking
+│   │   ├── embedding.py   # Embeddings and FAISS persistence
+│   │   ├── generator.py   # Gemini answer generation
+│   │   ├── loader.py      # PDF text extraction
+│   │   ├── main.py        # Interactive application
+│   │   └── retrievel.py   # Similarity retrieval
+│   ├── documents/book.pdf
+│   └── vector_store/      # Generated index and chunks
+└── Embeddchain/
+    ├── app.py             # Interactive EmbedChain application
+    ├── config.yaml        # LLM and embedder configuration
+    └── documents/         # Source PDFs
+```
+
+The files in `vector_store/` and `Embeddchain/db/` are generated data and can
+be rebuilt from the source documents when necessary.
